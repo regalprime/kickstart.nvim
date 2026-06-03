@@ -686,6 +686,8 @@ do
   --  See `:help lsp-config` for information about keys and how to configure
   ---@type table<string, vim.lsp.Config>
   local servers = {
+    
+    -- dartls = {},
     -- clangd = {},
     -- gopls = {},
     -- pyright = {},
@@ -757,6 +759,17 @@ do
   })
 
   require('mason-tool-installer').setup { ensure_installed = ensure_installed }
+
+  vim.lsp.config('dartls', {
+    cmd = { 'dart', 'language-server', '--protocol=lsp' },
+    filetypes = { 'dart' },
+    root_markers = {
+      'pubspec.yaml',
+      '.git',
+    },
+  })
+
+  vim.lsp.enable('dartls')
 
   for name, server in pairs(servers) do
     vim.lsp.config(name, server)
@@ -898,7 +911,7 @@ do
   vim.pack.add { { src = gh 'nvim-treesitter/nvim-treesitter', version = 'main' } }
 
   -- Ensure basic parsers are installed
-  local parsers = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc' }
+  local parsers = { 'bash', 'c', 'diff', 'html','dart' ,'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc' }
   require('nvim-treesitter').install(parsers)
 
   ---@param buf integer
@@ -970,7 +983,7 @@ do
   -- NOTE: You can add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
   --
   --  Uncomment the following line and add your plugins to `lua/custom/plugins/*.lua` to get going.
-  -- require 'custom.plugins'
+  require 'custom.plugins'
 end
 
 -- The line beneath this is called `modeline`. See `:help modeline`
