@@ -6,7 +6,7 @@ local i = ls.insert_node
 
 return {
   s("pt", {
-    t("debugPrint(' koking \\n' + '"),
+    t("print(' koking \\n' + '"),
     i(1),
     t("');"),
   }),
