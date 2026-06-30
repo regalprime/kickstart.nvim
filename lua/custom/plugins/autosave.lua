@@ -1,7 +1,7 @@
 vim.pack.add {
-  { src = gh "okuuva/auto-save.nvim" },
+  {
+    src = "https://github.com/okuuva/auto-save.nvim",
+  },
 }
 
-require("auto-save").setup {
-  enabled = true,
-}
+require("auto-save").setup()
