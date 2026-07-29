@@ -171,6 +171,17 @@ do
   -- instead raise a dialog asking if you wish to save the current file(s)
   -- See `:help 'confirm'`
   vim.o.confirm = true
+
+  vim.pack.add {
+    {
+      src = "https://github.com/lukas-reineke/virt-column.nvim",
+    },
+  }
+
+  require("virt-column").setup({
+    char = "│",
+    virtcolumn = "120",
+  })
 end
 
 -- ============================================================
