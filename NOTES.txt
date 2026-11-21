@@ -1,0 +1,499 @@
+================================================================
+ GHI CHÚ NEOVIM + FLUTTER CHO NGƯỜI MỚI
+================================================================
+
+Quy ước:
+  <leader> là phím SPACE (dấu cách).
+  "Space sf" nghĩa là bấm Space, rồi s, rồi f (bấm lần lượt, không giữ).
+  Ctrl+x nghĩa là giữ Ctrl rồi bấm x.
+  Bấm Space rồi chờ một chút, which-key sẽ hiện danh sách phím tiếp theo.
+  Quên phím nào thì bấm "Space sk" để tra.
+
+Mục lục
+  1.  Chế độ (mode)
+  2.  Lưu, thoát
+  3.  Di chuyển
+  4.  Sửa văn bản
+  5.  Tìm kiếm
+  6.  Cửa sổ, buffer
+  7.  Tìm file, tìm chữ (Telescope)
+  8.  Cây thư mục (Neo-tree)
+  9.  Code: LSP (nhảy tới định nghĩa, sửa nhanh, đổi tên)
+  10. Gợi ý code (autocomplete)
+  11. Git (gitsigns)
+  12. Bao quanh văn bản (mini.surround)
+  13. Debug (chung)
+  14. Terminal trong Neovim
+  15. Xem và sửa cấu hình
+  16. FLUTTER: chạy app lần đầu
+  17. FLUTTER: phím điều khiển app
+  18. FLUTTER: hot reload khi lưu
+  19. FLUTTER: bấm widget trên device, nhảy tới code
+  20. FLUTTER: công cụ kiểm tra giao diện
+  21. FLUTTER: debug từng bước
+  22. FLUTTER: sửa code nhanh (giống Alt+Enter)
+  23. FLUTTER: lỗi thường gặp
+  24. Bảng tra nhanh
+  25. Mẹo học
+
+
+================================================================
+ PHẦN A. NEOVIM CƠ BẢN
+================================================================
+
+----------------------------------------------------------------
+1. CHẾ ĐỘ (MODE)
+----------------------------------------------------------------
+Neovim có nhiều chế độ. Cùng một phím làm việc khác nhau tùy chế độ.
+
+  Normal        Esc (hoặc Ctrl+[)   Di chuyển, ra lệnh. Đây là chế độ mặc định
+  Insert        i                   Gõ chữ
+  Visual        v                   Chọn từng ký tự
+  Visual line   V                   Chọn cả dòng
+  Visual block  Ctrl+v              Chọn theo khối cột
+  Command       :                   Gõ lệnh như :w, :q
+
+Vào Insert:
+  i / a         Gõ trước / sau con trỏ
+  I / A         Gõ ở đầu / cuối dòng
+  o / O         Mở dòng mới bên dưới / bên trên
+
+Lạc đường thì bấm Esc vài lần để về Normal.
+
+----------------------------------------------------------------
+2. LƯU, THOÁT
+----------------------------------------------------------------
+  :w            Lưu
+  :q            Thoát cửa sổ hiện tại
+  :wq hoặc :x   Lưu rồi thoát
+  :q!           Thoát, bỏ thay đổi
+  :qa           Thoát hết mọi cửa sổ
+  :e!           Bỏ thay đổi, nạp lại file từ đĩa
+
+File được tự lưu (plugin auto-save), nhưng vẫn nên quen :w.
+
+----------------------------------------------------------------
+3. DI CHUYỂN
+----------------------------------------------------------------
+  h j k l       Trái, xuống, lên, phải
+  w / b         Sang đầu từ kế / đầu từ trước
+  e             Tới cuối từ
+  0 / ^ / $     Đầu dòng / ký tự đầu tiên có chữ / cuối dòng
+  gg / G        Đầu file / cuối file
+  {n}G          Tới dòng số n (ví dụ 42G)
+  { / }         Nhảy qua đoạn trước / sau
+  %             Nhảy tới dấu ngoặc tương ứng
+  Ctrl+d / u    Cuộn xuống / lên nửa trang
+  Ctrl+o / i    Về vị trí trước / tiến lên vị trí sau trong lịch sử nhảy
+  f{ký tự}      Nhảy tới ký tự đó trong dòng (; lặp lại, , lặp ngược)
+  zz            Đưa dòng hiện tại ra giữa màn hình
+
+Thêm số đứng trước để lặp: 5j đi xuống 5 dòng.
+
+----------------------------------------------------------------
+4. SỬA VĂN BẢN
+----------------------------------------------------------------
+Lệnh = hành động + phạm vi. Ví dụ "dw" là xóa một từ,
+"ci"" là sửa nội dung trong cặp ngoặc kép.
+
+Hành động:
+  d             Xóa (cắt)
+  c             Xóa rồi vào Insert
+  y             Copy (yank)
+  p / P         Dán sau / trước con trỏ
+  u             Hoàn tác
+  Ctrl+r        Làm lại
+  .             Lặp lại thay đổi vừa rồi
+  x             Xóa ký tự dưới con trỏ
+  r{ký tự}      Thay một ký tự
+  ~             Đổi hoa/thường
+  >> / <<       Thụt vào / lùi ra một dòng
+  J             Nối dòng dưới lên dòng này
+
+Phạm vi hay dùng:
+  w             Một từ
+  $             Tới cuối dòng
+  iw            Cả từ đang đứng
+  i" i( i{      Bên trong cặp "" / () / {}
+  a" a( a{      Cả cặp, gồm cả dấu ngoặc
+  ip            Cả đoạn
+
+Gõ đôi chữ để áp dụng cho cả dòng:
+  dd xóa dòng, yy copy dòng, cc sửa dòng.
+
+Ví dụ:
+  ciw   đổi từ đang đứng
+  di(   xóa mọi thứ trong cặp ngoặc tròn
+  yap   copy cả đoạn
+
+----------------------------------------------------------------
+5. TÌM KIẾM
+----------------------------------------------------------------
+  /chữ Enter    Tìm xuống
+  ?chữ Enter    Tìm lên
+  n / N         Kết quả kế / trước
+  *             Tìm từ đang đứng
+  Esc           Tắt highlight kết quả tìm
+  :%s/cũ/mới/g  Thay thế trong cả file
+  :%s/cũ/mới/gc Như trên nhưng hỏi xác nhận từng chỗ
+
+----------------------------------------------------------------
+6. CỬA SỔ, BUFFER
+----------------------------------------------------------------
+  Ctrl+h / j / k / l   Chuyển sang cửa sổ trái / dưới / trên / phải
+  :vsp                 Chia đôi dọc
+  :sp                  Chia đôi ngang
+  Ctrl+w rồi c         Đóng cửa sổ hiện tại
+  Ctrl+w rồi o         Chỉ giữ cửa sổ hiện tại
+  :bn / :bp            Buffer kế / trước
+  :bd                  Đóng buffer hiện tại
+  Space Space          Danh sách buffer đang mở (Telescope)
+
+----------------------------------------------------------------
+7. TÌM FILE, TÌM CHỮ (TELESCOPE)
+----------------------------------------------------------------
+Trong Telescope: gõ để lọc, Ctrl+n / Ctrl+p (hoặc mũi tên) chọn,
+Enter mở, Esc đóng.
+
+  Space sf      Tìm file theo tên
+  Space sg      Tìm chữ trong toàn project (grep)
+  Space sw      Tìm từ đang đứng
+  Space /       Tìm trong file hiện tại
+  Space s.      File vừa mở gần đây
+  Space Space   Buffer đang mở
+  Space sd      Danh sách lỗi, cảnh báo
+  Space sr      Mở lại lần tìm trước
+  Space sh      Tìm trong tài liệu hướng dẫn của Neovim
+  Space sk      Tìm phím tắt
+  Space sc      Tìm lệnh
+  Space sn      Tìm file trong thư mục cấu hình nvim
+  Space ss      Danh sách mọi picker của Telescope
+
+----------------------------------------------------------------
+8. CÂY THƯ MỤC (NEO-TREE)
+----------------------------------------------------------------
+  \             Mở cây thư mục, trỏ tới file đang mở
+  \ (trong cây) Đóng cây
+  Enter         Mở file hoặc mở thư mục
+  a             Tạo file (đuôi / thì tạo thư mục)
+  d             Xóa
+  r             Đổi tên
+  c / x / p     Copy / cắt / dán
+  ?             Xem toàn bộ phím trong cây
+
+----------------------------------------------------------------
+9. CODE: LSP
+----------------------------------------------------------------
+Các phím này chỉ có khi language server đã gắn vào file
+(mở file code, đợi vài giây).
+
+  grd           Nhảy tới định nghĩa
+  grr           Xem mọi chỗ dùng (references)
+  gri           Nhảy tới phần cài đặt (implementation)
+  grt           Nhảy tới định nghĩa kiểu
+  grD           Nhảy tới khai báo (declaration)
+  gra           Bảng action (giống Alt+Enter bên Android Studio)
+  grn           Đổi tên biến, hàm ở mọi nơi
+  gO            Danh sách symbol trong file
+  gW            Tìm symbol trong cả project
+  K             Xem tài liệu của thứ dưới con trỏ
+  Ctrl+o        Quay lại sau khi nhảy
+  Space f       Format file
+  Space th      Bật/tắt inlay hint
+
+Lưu ý: trong file Dart, "Space f" đứng một mình là format, nhưng
+"Space f" + chữ khác là lệnh Flutter. Bấm "Space f" một mình thì
+Neovim chờ một chút rồi mới format.
+
+Lỗi và cảnh báo:
+  Space q       Danh sách lỗi của file (location list)
+  ]d / [d       Lỗi kế / lỗi trước
+  Ctrl+w rồi d  Xem chi tiết lỗi dưới con trỏ
+
+----------------------------------------------------------------
+10. GỢI Ý CODE (AUTOCOMPLETE)
+----------------------------------------------------------------
+Dùng preset super-tab:
+
+  Tab                       Chấp nhận gợi ý. Nếu đang trong snippet thì
+                            nhảy sang ô kế
+  Shift+Tab                 Nhảy ngược trong snippet
+  Ctrl+Space                Mở gợi ý, hoặc mở tài liệu của gợi ý
+  Ctrl+n / Ctrl+p / mũi tên Chọn gợi ý kế / trước
+  Ctrl+e                    Đóng gợi ý
+
+----------------------------------------------------------------
+11. GIT (GITSIGNS)
+----------------------------------------------------------------
+Lề trái hiện dấu thay đổi của git.
+
+  ]c / [c       Tới thay đổi kế / trước
+  Space hp      Xem trước thay đổi
+  Space hi      Xem trước ngay trong dòng
+  Space hs      Stage thay đổi (hunk)
+  Space hr      Hoàn tác thay đổi (hunk)
+  Space hS      Stage cả file
+  Space hR      Hoàn tác cả file
+  Space hb      Xem ai sửa dòng này (blame)
+  Space hd      So sánh với bản đã stage
+  Space hD      So sánh với commit cuối
+  Space hq      Danh sách thay đổi trong file
+  Space hQ      Danh sách thay đổi trong cả repo
+  Space tb      Bật/tắt hiện blame ở cuối dòng
+  Space tw      Bật/tắt diff theo từ
+
+Muốn stage hoặc hoàn tác vài dòng: chọn bằng Visual (V) rồi
+Space hs hoặc Space hr.
+
+----------------------------------------------------------------
+12. BAO QUANH VĂN BẢN (MINI.SURROUND)
+----------------------------------------------------------------
+  saiw)         Thêm () bao quanh từ (add, inner word, ")")
+  sd'           Xóa cặp dấu ' bao quanh
+  sr)'          Đổi cặp () thành ''
+
+Chọn vùng bằng Visual rồi "sa" + ký tự cũng được.
+
+----------------------------------------------------------------
+13. DEBUG (CHUNG)
+----------------------------------------------------------------
+  F9 hoặc Space b   Bật/tắt breakpoint
+  Space B           Breakpoint có điều kiện
+  F5                Bắt đầu / tiếp tục
+  F10               Step over (sang dòng kế)
+  F11               Step into (vào hàm)
+  Shift+F11         Step out (ra khỏi hàm)
+  F1 / F2 / F3      Step into / over / out (bộ phím gốc của kickstart)
+  F7                Bật/tắt giao diện debug (dap-ui) trong tab riêng
+  gt / gT           Chuyển sang tab kế / tab trước (code <-> debug)
+
+Chi tiết debug app Flutter xem mục 21.
+
+----------------------------------------------------------------
+14. TERMINAL TRONG NEOVIM
+----------------------------------------------------------------
+  :terminal     Mở terminal
+  i             Vào chế độ gõ lệnh trong terminal
+  Esc Esc       Thoát chế độ gõ, về Normal
+
+----------------------------------------------------------------
+15. XEM VÀ SỬA CẤU HÌNH
+----------------------------------------------------------------
+  Mở thư mục cấu hình          Space sn
+  Áp dụng cấu hình mới         Thoát hẳn (:qa) rồi mở lại nvim
+  Kiểm tra sức khỏe cấu hình   :checkhealth
+  Tra phím đang gán cho gì     :verbose nmap {phím}   ví dụ :verbose nmap gra
+  Xem LSP đang gắn             :checkhealth vim.lsp
+  Quản lý LSP, formatter       :Mason
+
+File cấu hình:
+  init.lua                            Cấu hình chính, phím F5/F9/F10/F11
+  lua/custom/plugins/flutter.lua      flutter-tools: chạy app, debugger, outline, log
+  lua/custom/plugins/flutter_ide.lua  Phím tắt kiểu Android Studio, hot reload khi lưu
+  lua/kickstart/plugins/debug.lua     nvim-dap + dap-ui
+
+Muốn tắt phần "kiểu Android Studio" thì xóa hoặc đổi tên flutter_ide.lua.
+Tên file này phải xếp SAU "flutter.lua" (dùng dấu gạch dưới), nếu không
+các phím Flutter sẽ không được tạo.
+
+
+================================================================
+ PHẦN B. FLUTTER TRONG NEOVIM
+================================================================
+
+Các phím "Space f..." trong phần này CHỈ CÓ TRONG FILE .dart.
+Ở file khác, "Space f" là format.
+
+----------------------------------------------------------------
+16. CHẠY APP LẦN ĐẦU
+----------------------------------------------------------------
+  1. Mở terminal ở thư mục project Flutter, chạy "nvim ." rồi mở một
+     file .dart.
+  2. Bấm Space fe nếu cần mở emulator, rồi chọn emulator trong danh sách.
+  3. Bấm Space fd để chọn device hoặc emulator sẽ chạy app.
+  4. Bấm Space fr để chạy app ở chế độ debug. Nếu hỏi cấu hình thì
+     chọn Development hoặc Production. Debug UI (dap-ui) tự mở trong một tab mới (gt / gT để chuyển tab).
+  5. Sửa code rồi lưu. App tự hot reload.
+  6. Xong việc: Space fq để dừng app.
+
+Chờ vài giây sau khi mở file .dart để language server khởi động,
+nếu không thì gợi ý code và "gra" chưa hoạt động.
+
+----------------------------------------------------------------
+17. PHÍM ĐIỀU KHIỂN APP
+----------------------------------------------------------------
+  Space fr      Chạy / debug               :FlutterRun
+  Space fh      Hot reload                 :FlutterReload
+  Space fH      Hot restart                :FlutterRestart
+  Space fq      Dừng app                   :FlutterQuit
+  Space fd      Chọn device                :FlutterDevices
+  Space fe      Mở emulator                :FlutterEmulators
+  Space fa      Attach vào app đang chạy   :FlutterAttach
+  Space fl      Log trong cửa sổ nổi (khi đang debug)
+
+Hot reload giữ nguyên trạng thái app. Hot restart chạy lại từ đầu.
+Thêm biến mới, đổi initState hoặc đổi enum thì dùng hot restart.
+
+----------------------------------------------------------------
+18. HOT RELOAD KHI LƯU
+----------------------------------------------------------------
+- Lưu file .dart (kể cả auto-save) là app tự hot reload khi đang chạy.
+- Đang dừng ở breakpoint thì không reload. Bấm F5 cho app chạy tiếp
+  rồi lưu lại.
+
+----------------------------------------------------------------
+19. BẤM WIDGET TRÊN DEVICE, NHẢY TỚI CODE
+----------------------------------------------------------------
+Giống Select Widget Mode của Android Studio.
+
+  1. Chạy app bằng Space fr. Phải chạy bằng phím này (qua debugger)
+     thì mới nhảy được.
+  2. Bấm Space fi để bật chế độ chọn widget.
+  3. Bấm vào widget bất kỳ trên emulator hoặc device.
+  4. Neovim mở file và đặt con trỏ đúng dòng tạo widget đó.
+  5. Muốn chọn widget khác thì bấm Space fi lại.
+
+Tóm tắt: Space fr -> Space fi -> bấm widget trên device -> Neovim nhảy tới code.
+
+Lưu ý:
+- Chạy "flutter run" ngoài terminal hoặc dùng attach (Space fa) có thể
+  không nhảy được.
+- Widget của package hoặc framework mở file trong thư mục pub cache.
+  Đó là bình thường.
+- File mở trong cửa sổ đang focus. Nếu con trỏ đang ở panel debug hoặc
+  outline, dùng Ctrl+h/j/k/l về cửa sổ code trước khi bấm trên device.
+
+----------------------------------------------------------------
+20. CÔNG CỤ KIỂM TRA GIAO DIỆN
+----------------------------------------------------------------
+  Space fv      Vẽ khung layout (debug paint)
+  Space fP      Performance overlay
+  Space fR      Repaint rainbow
+  Space fs      Slow animations
+  Space fo      Cây widget của file hiện tại (outline)
+  Space ft      DevTools trong trình duyệt (widget tree, properties,
+                layout explorer, profiler)
+
+Terminal không có panel Inspector như Android Studio. Muốn xem
+properties và layout chi tiết thì dùng DevTools (Space ft).
+
+----------------------------------------------------------------
+21. DEBUG TỪNG BƯỚC
+----------------------------------------------------------------
+  F9 hoặc Space fb   Bật/tắt breakpoint
+  Space fB           Breakpoint có điều kiện
+  F5                 Chạy tiếp (continue)
+  F10                Step over (sang dòng kế)
+  F11                Step into (vào hàm)
+  Shift+F11          Step out (ra khỏi hàm)
+  Shift+F5           Dừng debug
+  Space fu           Bật/tắt tab debug
+  gt / gT            Chuyển qua lại giữa tab code và tab debug
+  Space fE           Tính biểu thức
+
+Chấm đỏ "●" là breakpoint. Dòng đang dừng hiện "▶" màu vàng.
+
+Các bước:
+  1. Đưa con trỏ tới dòng cần dừng, bấm F9. Dòng đó hiện "●".
+  2. Bấm Space fr để chạy app. Một TAB MỚI mở ra cho debug, giống cửa
+     sổ Debug của Android Studio: cột bên trái là stacks, scopes (biến),
+     watches, breakpoints; phần lớn bên phải là log của app (REPL, dòng nhắc "dap>" ở cuối
+     cho phép gõ biểu thức để tính).
+     Code nằm ở tab ban đầu. Bấm gt / gT để chuyển qua lại giữa hai tab.
+  3. Thao tác trên device để chạy qua dòng đó. Debugger dừng, dòng
+     hiện "▶".
+     Neovim tự nhảy về tab code và đưa con trỏ tới dòng đó. Muốn xem
+     biến thì bấm gt sang tab debug.
+  4. Muốn nhảy về hàm cha (nơi gọi hàm đang dừng): sang tab debug (gt),
+     trong panel stacks bấm đúp chuột (hoặc đưa con trỏ tới frame rồi
+     bấm Enter) vào frame bên dưới. Neovim nhảy về tab code, tới dòng
+     gọi. Frame trên cùng là hàm đang dừng, các frame bên dưới lần
+     lượt là hàm gọi nó.
+     Xem giá trị biến ở scopes. Muốn tính một biểu thức thì đặt con trỏ
+     lên biến rồi bấm Space fE.
+  5. Đi tiếp bằng F10, F11, Shift+F11 hoặc F5.
+  6. Breakpoint có điều kiện: bấm Space fB, nhập điều kiện, ví dụ
+     "count > 5".
+  7. Xong thì Shift+F5 để dừng debug, hoặc Space fq để dừng cả app.
+     Tab debug tự đóng khi phiên debug kết thúc.
+
+Debugger tự dừng khi có exception chưa được bắt, kể cả khi bạn không
+đặt breakpoint.
+
+----------------------------------------------------------------
+22. SỬA CODE NHANH (GIỐNG ALT+ENTER)
+----------------------------------------------------------------
+  gra           Bảng action: Wrap with widget, Extract widget, sửa lỗi...
+  grn           Đổi tên biến, hàm, class ở mọi nơi
+  grd           Nhảy tới định nghĩa
+  grr           Xem mọi chỗ dùng
+  K             Xem tài liệu
+  ]d / [d       Tới lỗi kế / trước
+  Space f       Format file (đứng một mình, chờ hết thời gian chờ phím)
+
+Dùng "gra" ngay trên widget để bọc bằng Padding, Center, Container,
+hoặc trích ra widget riêng.
+
+----------------------------------------------------------------
+23. LỖI THƯỜNG GẶP
+----------------------------------------------------------------
+- Bấm Space fd / Space fr không có gì:
+    Đang không ở file .dart. Mở một file .dart rồi thử lại.
+- Vẫn không có phản ứng sau khi sửa cấu hình:
+    Thoát hẳn nvim (:qa) rồi mở lại.
+- Không tìm thấy Flutter:
+    Kiểm tra đường dẫn Flutter SDK trong lua/custom/plugins/flutter.lua.
+- Bấm widget không nhảy tới code:
+    Chạy lại bằng Space fr, bật Space fi, kiểm tra :checkhealth.
+- gra, grd không có tác dụng:
+    Language server chưa gắn. Chờ vài giây, hoặc kiểm tra
+    :checkhealth vim.lsp.
+- Muốn xem lỗi chi tiết của app:
+    Space fl mở log (cửa sổ nổi, chỉ có khi đang debug).
+    Log nằm trong khung log bên phải của tab debug.
+- Kiểm tra một phím đang gán cho gì:
+    :verbose nmap <leader>fd   (gõ "Space" thay cho <leader> nếu cần)
+
+
+================================================================
+ PHẦN C. TRA NHANH
+================================================================
+
+----------------------------------------------------------------
+24. BẢNG TRA NHANH
+----------------------------------------------------------------
+Hằng ngày:
+  Space sf        Tìm file
+  Space sg        Tìm chữ trong project
+  Space Space     Chuyển buffer
+  \               Cây thư mục
+  Ctrl+h/j/k/l    Chuyển cửa sổ
+  gra             Bảng action
+  grd             Nhảy tới định nghĩa
+  grn             Đổi tên
+  Space f         Format
+
+Flutter:
+  Space fd        Chọn device
+  Space fe        Mở emulator
+  Space fr        Chạy / debug
+  Space fh        Hot reload
+  Space fH        Hot restart
+  Space fq        Dừng app
+  Space fi        Chọn widget trên device
+  Space fo        Cây widget
+  Space ft        DevTools
+  Space fl        Log (cửa sổ nổi)
+  F9              Breakpoint
+  F5 / F10 / F11 / Shift+F11   Continue / over / into / out
+  Shift+F5        Dừng debug
+
+----------------------------------------------------------------
+25. MẸO HỌC
+----------------------------------------------------------------
+- Học từng nhóm một. Tuần đầu chỉ cần: di chuyển, i/Esc, dd, yy, p, u, /.
+- Sau đó thêm Space sf, Space sg, \, grd, gra.
+- Gõ ":Tutor" để làm bài hướng dẫn tương tác có sẵn của Neovim
+  (khoảng 30 phút).
+- Gặp thứ không biết thì ":help {từ khóa}" hoặc Space sh.
+- Quên phím thì Space sk.
